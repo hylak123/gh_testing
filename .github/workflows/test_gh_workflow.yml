@@ -20,8 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        # ref: 4259d927865045c5ea89f7c0b809219c64d7c540 
-        ref: 699b5dbe573e91c311671016a4d9e41b487fa51f
+        ref: 4259d927865045c5ea89f7c0b809219c64d7c540
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
@@ -31,11 +30,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    # - name: Lint with Ruff
-    #   run: |
-    #     pip install ruff
-    #     ruff check --output-format=github .
-    #   continue-on-error: true
+     - name: Lint with Ruff
+       run: |
+         pip install ruff
+         ruff check --output-format=github .
+       continue-on-error: true
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -53,7 +52,5 @@ jobs:
         pytest -s "test_github.py::TestGithub::test_switch_branch"
         pytest -s "test_github.py::TestGithub::test_pull"
         pytest -s "test_github.py::TestGithub::test_push"        
-        # pytest -m CI
-    # - name: Generate pytest report
-    #   run: |
-    #     pytest -m smoke --html=.\html_reports\report_gh_test.html --self-contained-html
+        # pytest -m smoke
+

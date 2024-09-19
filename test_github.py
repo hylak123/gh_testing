@@ -238,7 +238,7 @@ class TestGithub:
                     f"New branch {new_branch} created. New branch is different from active branch: {repo.active_branch}"
                 )
             except git.exc.GitError:
-                pass
+                print("Failed to create branch")
         elif action == "test_switch_branch":
             print("Test switch to a new branch")
             try:
