@@ -19,7 +19,7 @@ class TestGithub:
         yield repo_path
         try:
             if Path(repo_path).exists():
-                # shutil.rmtree(repo_path)
+                shutil.rmtree(repo_path)
                 print(f"Cleanup after test performed. Removed {repo_path}")
         except OSError:
             print(f"Cleanup failed, failed to remove {repo_path}")
