@@ -1,3 +1,5 @@
+import logging
+import os
 from pathlib import Path
 
 from git import Repo
@@ -25,7 +27,7 @@ class BasicCommands:
     @staticmethod
     def clone_remote_repo(repo_url: str, local_path: Path | str):
         """
-        To create a local copy of the repository at the specified local_path directory,
+        To create a local copy of the repository at the specified local_path directory via HTTPS,
         using the repository URL repo_url
         :param repo_url: URL of remote repository
         :param local_path: a path on local filesystem
@@ -33,6 +35,20 @@ class BasicCommands:
         """
         print(f"Cloning repository, url: {repo_url} at location: {local_path}")
         return Repo.clone_from(repo_url, local_path)
+
+    @staticmethod
+    def clone_remote_repo_ssh(repo_addr: str, local_path: Path | str):
+        """
+        To create a local copy of the repository at the specified local_path directory via SSH
+        :param repo_addr: URL of remote repository
+        :param local_path: a path on local filesystem
+        :return: repository obj
+        """
+        logging.basicConfig(level=logging.INFO)
+        os.environ["GIT_PYTHON_TRACE"] = "1"
+        return Repo.clone_from(
+            repo_addr, local_path, env={"GIT_SSH_COMMAND": "ssh -i /tmp/id_rsa"}
+        )
 
     @staticmethod
     def add_files_to_stage(repo, files: list | None):

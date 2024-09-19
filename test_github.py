@@ -9,6 +9,7 @@ import platform
 from basic_commands import BasicCommands as _BCmd
 
 REPO_URL_HTTPS = "https://github.com/hylak123/gh_testing.git"
+REPO_SSH = "git@github.com:hylak123/gh_testing.git"
 
 
 def content_generator(text_type: str, text_length: int, save_path=None) -> list | str:
@@ -41,6 +42,11 @@ if "Windows" in platform.system():
         "test_open_existing_repo": {"repo_path_local": r"C:\work\gh_testing2"},
         "test_clone_remote_repo_https": {
             "remote_repo_url": REPO_URL_HTTPS,
+            "repo_path_local": r"C:\work\gh_testing3",
+            "protocol": "https",
+        },
+        "test_clone_remote_repo_ssh": {
+            "remote_repo_url": REPO_SSH,
             "repo_path_local": r"C:\work\gh_testing3",
         },
         "test_commit": {
@@ -77,6 +83,11 @@ else:
         "test_clone_remote_repo_https": {
             "remote_repo_url": REPO_URL_HTTPS,
             "repo_path_local": HOME,
+            "protocol": "https",
+        },
+        "test_clone_remote_repo_ssh": {
+            "remote_repo_url": REPO_SSH,
+            "repo_path_local": r"C:\work\gh_testing3",
         },
         "test_commit": {
             "remote_repo_url": REPO_URL_HTTPS,
@@ -110,25 +121,27 @@ class TestGithub:
     """A class holding git commands and tests."""
 
     @pytest.mark.smoke
+    @pytest.mark.CI
     def test_repo_init(
-            self,
-            action="test_repo_init",
-            repo_path_local=TEST_DATA["test_repo_init"]["repo_path_local"],
+        self,
+        action="test_repo_init",
+        repo_path_local=TEST_DATA["test_repo_init"]["repo_path_local"],
     ):
         self.run_gh_test_flow_template(action=action, repo_path_local=repo_path_local)
 
+    @pytest.mark.CI
     def test_open_existing_repo(
-            self,
-            action="test_open_existing_repo",
-            repo_path_local=TEST_DATA["test_open_existing_repo"]["repo_path_local"],
+        self,
+        action="test_open_existing_repo",
+        repo_path_local=TEST_DATA["test_open_existing_repo"]["repo_path_local"],
     ):
         self.run_gh_test_flow_template(action=action, repo_path_local=repo_path_local)
 
     def test_clone_remote_repo_https(
-            self,
-            action="test_clone_remote_repo_https",
-            remote_repo_url=TEST_DATA["test_clone_remote_repo_https"]["remote_repo_url"],
-            repo_path_local=TEST_DATA["test_clone_remote_repo_https"]["repo_path_local"],
+        self,
+        action="test_clone_remote_repo_https",
+        remote_repo_url=TEST_DATA["test_clone_remote_repo_https"]["remote_repo_url"],
+        repo_path_local=TEST_DATA["test_clone_remote_repo_https"]["repo_path_local"],
     ):
         self.run_gh_test_flow_template(
             action=action,
@@ -136,12 +149,27 @@ class TestGithub:
             repo_path_local=repo_path_local,
         )
 
+    @pytest.mark.parametrize("protocol", ["https", "ssh"], ids=["https", "ssh"])
+    def test_clone_remote_repo_(
+        self,
+        protocol,
+        action="test_clone_remote_repo_https",
+        remote_repo_url=TEST_DATA["test_clone_remote_repo_https"]["remote_repo_url"],
+        repo_path_local=TEST_DATA["test_clone_remote_repo_https"]["repo_path_local"],
+    ):
+        self.run_gh_test_flow_template(
+            action=action,
+            remote_repo_url=remote_repo_url,
+            repo_path_local=repo_path_local,
+            protocol=protocol,
+        )
+
     def test_commit(
-            self,
-            action="test_commit",
-            remote_repo_url=TEST_DATA["test_commit"]["remote_repo_url"],
-            repo_path_local=TEST_DATA["test_commit"]["repo_path_local"],
-            commit_msg=TEST_DATA["test_commit"]["commit_msg"],
+        self,
+        action="test_commit",
+        remote_repo_url=TEST_DATA["test_commit"]["remote_repo_url"],
+        repo_path_local=TEST_DATA["test_commit"]["repo_path_local"],
+        commit_msg=TEST_DATA["test_commit"]["commit_msg"],
     ):
         self.run_gh_test_flow_template(
             action=action,
@@ -151,11 +179,11 @@ class TestGithub:
         )
 
     def test_create_new_branch(
-            self,
-            action="test_create_new_branch",
-            remote_repo_url=TEST_DATA["test_create_new_branch"]["remote_repo_url"],
-            repo_path_local=TEST_DATA["test_create_new_branch"]["repo_path_local"],
-            new_branch_name=TEST_DATA["test_create_new_branch"]["new_branch_name"],
+        self,
+        action="test_create_new_branch",
+        remote_repo_url=TEST_DATA["test_create_new_branch"]["remote_repo_url"],
+        repo_path_local=TEST_DATA["test_create_new_branch"]["repo_path_local"],
+        new_branch_name=TEST_DATA["test_create_new_branch"]["new_branch_name"],
     ):
         self.run_gh_test_flow_template(
             action=action,
@@ -165,11 +193,11 @@ class TestGithub:
         )
 
     def test_switch_branch(
-            self,
-            action="test_switch_branch",
-            # remote_repo_url=TEST_DATA["test_switch_branch"]["remote_repo_url"],
-            repo_path_local=TEST_DATA["test_switch_branch"]["repo_path_local"],
-            existing_branch_name=TEST_DATA["test_switch_branch"]["existing_branch_name"],
+        self,
+        action="test_switch_branch",
+        # remote_repo_url=TEST_DATA["test_switch_branch"]["remote_repo_url"],
+        repo_path_local=TEST_DATA["test_switch_branch"]["repo_path_local"],
+        existing_branch_name=TEST_DATA["test_switch_branch"]["existing_branch_name"],
     ):
         self.run_gh_test_flow_template(
             action=action,
@@ -179,11 +207,11 @@ class TestGithub:
         )
 
     def test_pull(
-            self,
-            action="test_pull",
-            remote_repo_url=TEST_DATA["test_pull"]["remote_repo_url"],
-            repo_path_local=TEST_DATA["test_pull"]["repo_path_local"],
-            existing_branch_name=TEST_DATA["test_pull"]["existing_branch_name"],
+        self,
+        action="test_pull",
+        remote_repo_url=TEST_DATA["test_pull"]["remote_repo_url"],
+        repo_path_local=TEST_DATA["test_pull"]["repo_path_local"],
+        existing_branch_name=TEST_DATA["test_pull"]["existing_branch_name"],
     ):
         self.run_gh_test_flow_template(
             action=action,
@@ -193,11 +221,11 @@ class TestGithub:
         )
 
     def test_push(
-            self,
-            action="test_push",
-            # remote_repo_url=TEST_DATA["test_push"]["remote_repo_url"],
-            repo_path_local=TEST_DATA["test_push"]["repo_path_local"],
-            existing_branch_name=TEST_DATA["test_push"]["existing_branch_name"],
+        self,
+        action="test_push",
+        # remote_repo_url=TEST_DATA["test_push"]["remote_repo_url"],
+        repo_path_local=TEST_DATA["test_push"]["repo_path_local"],
+        existing_branch_name=TEST_DATA["test_push"]["existing_branch_name"],
     ):
         self.run_gh_test_flow_template(
             action=action,
@@ -208,12 +236,13 @@ class TestGithub:
 
     @staticmethod
     def run_gh_test_flow_template(
-            action,
-            repo_path_local=None,
-            remote_repo_url=None,
-            commit_msg="",
-            new_branch_name="",
-            existing_branch_name="",
+        action,
+        repo_path_local=None,
+        remote_repo_url=None,
+        commit_msg="",
+        new_branch_name="",
+        existing_branch_name="",
+        protocol="https",
     ):
         """
         Positive test flow template method
@@ -229,7 +258,7 @@ class TestGithub:
             print("Test repo init")
             new_repo = _BCmd.init_repo(repo_path_local)
             assert (
-                    new_repo.working_dir == repo_path_local
+                new_repo.working_dir == repo_path_local
             ), f"Repo {new_repo} initialization failed"
             print(
                 f"New repo {new_repo.git_dir} initialized. Working dir {new_repo.working_dir}"
@@ -237,23 +266,31 @@ class TestGithub:
         elif action == "test_open_existing_repo":
             print("Test open the existing local repo")
             assert (
-                    Path(repo_path_local).exists()
-                    and Path(repo_path_local + "/.git").exists()
+                Path(repo_path_local).exists()
+                and Path(repo_path_local + "/.git").exists()
             ), f"Repo {repo_path_local} does not exist or is not a git repository"
             existing_repo = _BCmd.open_existing_local_repo(repo_path_local)
             assert (
-                    existing_repo.working_dir == repo_path_local
+                existing_repo.working_dir == repo_path_local
             ), f"Failed to open {existing_repo.working_dir}"
             print(f"Existing repo {existing_repo.git_dir} opened")
-        # parametrize
         elif action == "test_clone_remote_repo_https":
-            print("Test clone a remote repo")
+            print("Test clone a remote repo https")
             cloned_repo = _BCmd.clone_remote_repo(remote_repo_url, repo_path_local)
             assert (
-                    cloned_repo.working_dir == repo_path_local
+                cloned_repo.working_dir == repo_path_local
             ), f"Failed to create {cloned_repo}, url: {remote_repo_url} at location: {repo_path_local}"
             print(
                 f"Repository {cloned_repo}, url: {remote_repo_url} cloned at location: {repo_path_local}"
+            )
+        elif action == "test_clone_remote_repo_ssh":
+            print("Test clone a remote repo ssh")
+            cloned_repo = _BCmd.clone_remote_repo_ssh(remote_repo_url, repo_path_local)
+            assert (
+                cloned_repo.working_dir == repo_path_local
+            ), f"Failed to create {cloned_repo}, url: {remote_repo_url} at location: {repo_path_local}"
+            print(
+                f"Repository {cloned_repo} via ssh, addr: {remote_repo_url} cloned at location: {repo_path_local}"
             )
         elif action == "test_commit":
             print("Test adding files to stage and commit")
@@ -264,7 +301,7 @@ class TestGithub:
 
             head_commit = repo.head.commit
             assert (
-                    head_commit.message == commit_msg
+                head_commit.message == commit_msg
             ), f"Last commit message {commit_msg} differs from {head_commit.message}"
         elif action == "test_create_new_branch":
             print("Test creating a new branch")
@@ -275,7 +312,7 @@ class TestGithub:
                 repo = _BCmd.open_existing_local_repo(repo_path_local)
                 new_branch = _BCmd.create_new_branch(repo, new_branch_name)
                 assert (
-                        repo.active_branch != new_branch
+                    repo.active_branch != new_branch
                 ), f"Branch {new_branch} already exists in repo {repo}"
                 print(
                     f"New branch {new_branch} created. New branch is different from active branch: {repo.active_branch}"
@@ -293,7 +330,7 @@ class TestGithub:
 
             _BCmd.switch_branch(repo, existing_branch_name)
             assert (
-                    existing_branch in existing_branches
+                existing_branch in existing_branches
             ), f"Branch {existing_branch} does not exist in repo: {repo}"
             print(f"Switched to branch {existing_branch} existing in repo: {repo}")
         elif action == "test_pull":
@@ -340,6 +377,6 @@ class TestGithub:
             commit_msg = content_generator("commit_msg", 10)
             _BCmd.commit(repo, commit_msg)
 
-            print('Pushed changes to origin')
+            print("Pushed changes to origin")
 
             _BCmd.push(repo)
