@@ -46,4 +46,4 @@ jobs:
         pytest -s "test_github.py::TestGithub::test_repo_init"
     - name: Generate pytest report
       run: |
-        pytest .  --html=.\html_reports\report_gh_test.html --self-contained-html
+        pytest -m smoke --html=.\html_reports\report_gh_test.html --self-contained-html
