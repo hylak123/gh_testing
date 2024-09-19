@@ -1,132 +1,24 @@
 import platform
-import shutil
-import string
 from pathlib import Path
-from random import choices
 
 import git
 import pytest
 
-from basic_commands import BasicCommands as _BCmd
-
-REPO_URL_HTTPS = "https://github.com/hylak123/gh_testing.git"
-REPO_SSH = "git@github.com:hylak123/gh_testing.git"
-
-
-def content_generator(text_type: str, text_length: int, save_path=None) -> list | str:
-    if text_type == "commit_msg":
-        commit_msg = "Random commit message: " + "".join(
-            choices(string.ascii_letters, k=text_length)
-        )
-        return str(commit_msg)
-    elif text_type == "text":
-        random_txt = "".join(choices(string.ascii_letters, k=text_length))
-        return str(random_txt)
-    elif text_type == "file":
-        filename = str("".join(choices(string.ascii_letters, k=text_length)) + ".txt")
-        random_content = []
-        [
-            random_content.append(
-                str("".join(choices(string.ascii_letters, k=text_length))) + "\n"
-            )
-            for _ in range(text_length)
-        ]
-        filepath = save_path + "\\" + filename
-        with open(filepath, "a") as file:
-            file.writelines(random_content)
-        return filepath
-
-
-if "Windows" in platform.system():
-    HOME = r"C:\work\gh_testing3"
-    TEST_DATA = {
-        "test_repo_init": {"repo_path_local": r"C:\work\gh_testing2"},
-        "test_open_existing_repo": {"repo_path_local": r"C:\work\gh_testing2"},
-        "test_clone_remote_repo_https": {
-            "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": r"C:\work\gh_testing3",
-        },
-        "test_clone_remote_repo_ssh": {
-            "remote_repo_url": REPO_SSH,
-            "repo_path_local": r"C:\work\gh_testing3",
-        },
-        "test_commit": {
-            "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": r"C:\work\gh_testing5",
-            "commit_msg": content_generator("commit_msg", 10),
-        },
-        "test_create_new_branch": {
-            "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": r"C:\work\gh_testing6",
-            "new_branch_name": content_generator("text", 20),
-        },
-        "test_switch_branch": {
-            # "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": r"C:\work\gh_testing6",
-            "existing_branch_name": content_generator("text", 20),
-        },
-        "test_pull": {
-            "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": r"C:\work\gh_testing7",
-            "existing_branch_name": "main",
-        },
-        "test_push": {
-            # "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": r"C:\work\gh_testing7",
-            "existing_branch_name": "main",
-        },
-    }
-else:
-    HOME = r"/home/runner/work/gh_testing"
-    TEST_DATA = {
-        "test_repo_init": {"repo_path_local": HOME},
-        "test_open_existing_repo": {"repo_path_local": HOME},
-        "test_clone_remote_repo_https": {
-            "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": HOME,
-        },
-        "test_clone_remote_repo_ssh": {
-            "remote_repo_url": REPO_SSH,
-            "repo_path_local": r"C:\work\gh_testing3",
-        },
-        "test_commit": {
-            "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": HOME,
-            "commit_msg": content_generator("commit_msg", 10),
-        },
-        "test_create_new_branch": {
-            "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": HOME,
-            "new_branch_name": content_generator("text", 20),
-        },
-        "test_switch_branch": {
-            # "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": HOME,
-            "existing_branch_name": content_generator("text", 20),
-        },
-        "test_pull": {
-            "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": HOME,
-            "existing_branch_name": "main",
-        },
-        "test_push": {
-            # "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": HOME,
-            "existing_branch_name": "main",
-        },
-    }
+from basic_commands import BasicCommands as _BCmd, content_generator
+from data_feed import get_data_feed
 
 
 class TestGithub:
     """A class holding git commands and tests."""
+    HOME_DIR, TEST_DATA = get_data_feed()
 
     @pytest.fixture
     def cleanup(self):
         if "Windows" in platform.system():
-            HOME = r"C:\work\gh_testing3"
+            HOME_DIR = r"C:\work\gh_testing3"
         else:
-            HOME = r"/home/runner/work/gh_testing"
-        yield HOME
+            HOME_DIR = r"/home/runner/work/gh_testing"
+        yield HOME_DIR
         try:
             # shutil.rmtree(HOME)
             print("Cleanup after test performed")

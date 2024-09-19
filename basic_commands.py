@@ -1,6 +1,8 @@
 import logging
 import os
+import string
 from pathlib import Path
+from random import choices
 
 from git import Repo
 
@@ -118,3 +120,27 @@ class BasicCommands:
         """
         origin = repo.remote(name="origin")
         origin.pull()
+
+
+def content_generator(text_type: str, text_length: int, save_path=None) -> list | str:
+    if text_type == "commit_msg":
+        commit_msg = "Random commit message: " + "".join(
+            choices(string.ascii_letters, k=text_length)
+        )
+        return str(commit_msg)
+    elif text_type == "text":
+        random_txt = "".join(choices(string.ascii_letters, k=text_length))
+        return str(random_txt)
+    elif text_type == "file":
+        filename = str("".join(choices(string.ascii_letters, k=text_length)) + ".txt")
+        random_content = []
+        [
+            random_content.append(
+                str("".join(choices(string.ascii_letters, k=text_length))) + "\n"
+            )
+            for _ in range(text_length)
+        ]
+        filepath = save_path + "\\" + filename
+        with open(filepath, "a") as file:
+            file.writelines(random_content)
+        return filepath
