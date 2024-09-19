@@ -1,10 +1,11 @@
+import platform
+import shutil
 import string
 from pathlib import Path
 from random import choices
 
 import git
 import pytest
-import platform
 
 from basic_commands import BasicCommands as _BCmd
 
@@ -37,6 +38,7 @@ def content_generator(text_type: str, text_length: int, save_path=None) -> list 
 
 
 if "Windows" in platform.system():
+    HOME = r"C:\work\gh_testing3"
     TEST_DATA = {
         "test_repo_init": {"repo_path_local": r"C:\work\gh_testing2"},
         "test_open_existing_repo": {"repo_path_local": r"C:\work\gh_testing2"},
@@ -118,10 +120,24 @@ else:
 class TestGithub:
     """A class holding git commands and tests."""
 
+    @pytest.fixture
+    def cleanup(self):
+        if "Windows" in platform.system():
+            HOME = r"C:\work\gh_testing3"
+        else:
+            HOME = r"/home/runner/work/gh_testing"
+        yield HOME
+        try:
+            # shutil.rmtree(HOME)
+            print("Cleanup after test performed")
+        except OSError:
+            print("Failed to cleanup")
+
     @pytest.mark.smoke
     @pytest.mark.CI
     def test_repo_init(
         self,
+        cleanup,
         action="test_repo_init",
         repo_path_local=TEST_DATA["test_repo_init"]["repo_path_local"],
     ):
@@ -237,7 +253,6 @@ class TestGithub:
         commit_msg="",
         new_branch_name="",
         existing_branch_name="",
-        protocol="https",
     ):
         """
         Positive test flow template method
@@ -247,7 +262,6 @@ class TestGithub:
         :param commit_msg: message to commit
         :param new_branch_name: name of new branch to create
         :param existing_branch_name: name of a branch existing in repo
-
         """
         if action == "test_repo_init":
             print("Test repo init")
