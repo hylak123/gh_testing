@@ -34,6 +34,7 @@ class TestGithub:
     ):
         self.run_gh_test_flow_template(action=action, repo_path_local=repo_path_local)
 
+    @pytest.mark.smoke
     @pytest.mark.CI
     def test_open_existing_repo(
         self,
