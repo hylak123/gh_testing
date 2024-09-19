@@ -146,13 +146,13 @@ class TestGithub:
         self,
         cleanup,
         action="test_push",
-        # remote_repo_url=TEST_DATA["test_push"]["remote_repo_url"],
+        remote_repo_url=TEST_DATA["test_push"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_push"]["repo_path_local"],
         existing_branch_name=TEST_DATA["test_push"]["existing_branch_name"],
     ):
         self.run_gh_test_flow_template(
             action=action,
-            # remote_repo_url=remote_repo_url,
+            remote_repo_url=remote_repo_url,
             repo_path_local=repo_path_local,
             existing_branch_name=existing_branch_name,
         )
@@ -303,7 +303,7 @@ class TestGithub:
                     print(repo.remotes.origin.push())
         elif action == "test_push":
             print("Test pushing local commits to remote repo")
-            repo = _BCmd.open_existing_local_repo(repo_path_local)
+            repo = _BCmd.clone_remote_repo(remote_repo_url, repo_path_local)
             _BCmd.switch_branch(repo, existing_branch_name)
 
             print("Test adding files to stage and commit")

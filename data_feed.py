@@ -7,22 +7,21 @@ REPO_SSH = "git@github.com:hylak123/gh_testing.git"
 
 
 def get_data_feed():
-    HOME = ""
     system = platform.system()
     if "Windows" in system:
         HOME = r"C:\work\gh_testing"
     else:
-        HOME = r"/home/runner/work"
+        HOME = r"/home/runner/work/gh_testing"
 
-    TEST_DATA = {
-        "test_repo_init": {"repo_path_local": HOME},
+    _TEST_DATA = {
+        "test_repo_init": {"repo_path_local": HOME + content_generator("text", 10)},
         "test_open_existing_repo": {
             "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": HOME,
+            "repo_path_local": HOME + content_generator("text", 10),
         },
         "test_clone_remote_repo_https": {
             "remote_repo_url": REPO_URL_HTTPS,
-            "repo_path_local": HOME,
+            "repo_path_local": HOME + content_generator("text", 10),
         },
         "test_clone_remote_repo_ssh": {
             "remote_repo_url": REPO_SSH,
@@ -50,9 +49,9 @@ def get_data_feed():
             "existing_branch_name": "main",
         },
         "test_push": {
-            # "remote_repo_url": REPO_URL_HTTPS,
+            "remote_repo_url": REPO_URL_HTTPS,
             "repo_path_local": HOME + content_generator("text", 10),
             "existing_branch_name": "main",
         },
     }
-    return HOME, TEST_DATA
+    return HOME, _TEST_DATA
