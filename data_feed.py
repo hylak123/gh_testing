@@ -12,7 +12,7 @@ def get_data_feed():
     if "Windows" in system:
         HOME = r"C:\work\gh_testing"
     else:
-        HOME = r"/home/runner/work/gh_testing"
+        HOME = r"/home/runner/work"
 
     TEST_DATA = {
         "test_repo_init": {"repo_path_local": HOME},
