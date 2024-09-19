@@ -4,6 +4,7 @@ from random import choices
 
 import git
 import pytest
+import platform
 
 from basic_commands import BasicCommands as _BCmd
 
@@ -34,39 +35,44 @@ def content_generator(text_type: str, text_length: int, save_path=None) -> list 
         return filepath
 
 
-TEST_DATA = {
-    "test_repo_init": {"repo_path_local": r"C:\work\gh_testing2"},
-    "test_open_existing_repo": {"repo_path_local": r"C:\work\gh_testing2"},
-    "test_clone_remote_repo_https": {
-        "remote_repo_url": REPO_URL_HTTPS,
-        "repo_path_local": r"C:\work\gh_testing3",
-    },
-    "test_commit": {
-        "remote_repo_url": REPO_URL_HTTPS,
-        "repo_path_local": r"C:\work\gh_testing5",
-        "commit_msg": content_generator("commit_msg", 10),
-    },
-    "test_create_new_branch": {
-        "remote_repo_url": REPO_URL_HTTPS,
-        "repo_path_local": r"C:\work\gh_testing6",
-        "new_branch_name": content_generator("text", 20),
-    },
-    "test_switch_branch": {
-        # "remote_repo_url": REPO_URL_HTTPS,
-        "repo_path_local": r"C:\work\gh_testing6",
-        "existing_branch_name": content_generator("text", 20),
-    },
-    "test_pull": {
-        "remote_repo_url": REPO_URL_HTTPS,
-        "repo_path_local": r"C:\work\gh_testing7",
-        "existing_branch_name": "main",
-    },
-    "test_push": {
-        # "remote_repo_url": REPO_URL_HTTPS,
-        "repo_path_local": r"C:\work\gh_testing7",
-        "existing_branch_name": "main",
-    },
-}
+if "Windows" in platform.system():
+    TEST_DATA = {
+        "test_repo_init": {"repo_path_local": r"C:\work\gh_testing2"},
+        "test_open_existing_repo": {"repo_path_local": r"C:\work\gh_testing2"},
+        "test_clone_remote_repo_https": {
+            "remote_repo_url": REPO_URL_HTTPS,
+            "repo_path_local": r"C:\work\gh_testing3",
+        },
+        "test_commit": {
+            "remote_repo_url": REPO_URL_HTTPS,
+            "repo_path_local": r"C:\work\gh_testing5",
+            "commit_msg": content_generator("commit_msg", 10),
+        },
+        "test_create_new_branch": {
+            "remote_repo_url": REPO_URL_HTTPS,
+            "repo_path_local": r"C:\work\gh_testing6",
+            "new_branch_name": content_generator("text", 20),
+        },
+        "test_switch_branch": {
+            # "remote_repo_url": REPO_URL_HTTPS,
+            "repo_path_local": r"C:\work\gh_testing6",
+            "existing_branch_name": content_generator("text", 20),
+        },
+        "test_pull": {
+            "remote_repo_url": REPO_URL_HTTPS,
+            "repo_path_local": r"C:\work\gh_testing7",
+            "existing_branch_name": "main",
+        },
+        "test_push": {
+            # "remote_repo_url": REPO_URL_HTTPS,
+            "repo_path_local": r"C:\work\gh_testing7",
+            "existing_branch_name": "main",
+        },
+    }
+else:
+    TEST_DATA = {
+        "test_repo_init": {"repo_path_local": r"/home/runner/work/gh_testing/gh_testing"},
+        }
 
 
 class TestGithub:
@@ -191,9 +197,9 @@ class TestGithub:
         if action == "test_repo_init":
             print("Test repo init")
             new_repo = _BCmd.init_repo(repo_path_local)
-            # assert (
-            #         new_repo.working_dir == repo_path_local
-            # ), f"Repo {new_repo} initialization failed"
+            assert (
+                    new_repo.working_dir == repo_path_local
+            ), f"Repo {new_repo} initialization failed"
             print(
                 f"New repo {new_repo.git_dir} initialized. Working dir {new_repo.working_dir}"
             )
