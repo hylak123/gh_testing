@@ -16,7 +16,10 @@ def get_data_feed():
 
     TEST_DATA = {
         "test_repo_init": {"repo_path_local": HOME + content_generator("text", 10)},
-        "test_open_existing_repo": {"remote_repo_url": REPO_URL_HTTPS, "repo_path_local": HOME + content_generator("text", 10)},
+        "test_open_existing_repo": {
+            "remote_repo_url": REPO_URL_HTTPS,
+            "repo_path_local": HOME + content_generator("text", 10),
+        },
         "test_clone_remote_repo_https": {
             "remote_repo_url": REPO_URL_HTTPS,
             "repo_path_local": HOME + content_generator("text", 10),
