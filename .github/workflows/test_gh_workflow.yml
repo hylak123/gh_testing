@@ -44,6 +44,6 @@ jobs:
         # pip install pytest pytest-cov
         # pytest test_github.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
         pytest -s "test_github.py::TestGithub::test_repo_init"
-    - name: Generate pytest report
-      run: |
-        pytest -m smoke --html=.\html_reports\report_gh_test.html --self-contained-html
+    # - name: Generate pytest report
+    #   run: |
+    #     pytest -m smoke --html=.\html_reports\report_gh_test.html --self-contained-html
