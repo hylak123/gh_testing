@@ -43,7 +43,6 @@ if "Windows" in platform.system():
         "test_clone_remote_repo_https": {
             "remote_repo_url": REPO_URL_HTTPS,
             "repo_path_local": r"C:\work\gh_testing3",
-            "protocol": "https",
         },
         "test_clone_remote_repo_ssh": {
             "remote_repo_url": REPO_SSH,
@@ -83,7 +82,6 @@ else:
         "test_clone_remote_repo_https": {
             "remote_repo_url": REPO_URL_HTTPS,
             "repo_path_local": HOME,
-            "protocol": "https",
         },
         "test_clone_remote_repo_ssh": {
             "remote_repo_url": REPO_SSH,
@@ -149,19 +147,16 @@ class TestGithub:
             repo_path_local=repo_path_local,
         )
 
-    @pytest.mark.parametrize("protocol", ["https", "ssh"], ids=["https", "ssh"])
-    def test_clone_remote_repo_(
+    def test_clone_remote_repo_ssh(
         self,
-        protocol,
-        action="test_clone_remote_repo_https",
-        remote_repo_url=TEST_DATA["test_clone_remote_repo_https"]["remote_repo_url"],
-        repo_path_local=TEST_DATA["test_clone_remote_repo_https"]["repo_path_local"],
+        action="test_clone_remote_repo_ssh",
+        remote_repo_url=TEST_DATA["test_clone_remote_repo_ssh"]["remote_repo_url"],
+        repo_path_local=TEST_DATA["test_clone_remote_repo_ssh"]["repo_path_local"],
     ):
         self.run_gh_test_flow_template(
             action=action,
             remote_repo_url=remote_repo_url,
             repo_path_local=repo_path_local,
-            protocol=protocol,
         )
 
     def test_commit(
@@ -275,22 +270,22 @@ class TestGithub:
             ), f"Failed to open {existing_repo.working_dir}"
             print(f"Existing repo {existing_repo.git_dir} opened")
         elif action == "test_clone_remote_repo_https":
-            print("Test clone a remote repo https")
+            print("Test clone a remote repo via https")
             cloned_repo = _BCmd.clone_remote_repo(remote_repo_url, repo_path_local)
             assert (
                 cloned_repo.working_dir == repo_path_local
             ), f"Failed to create {cloned_repo}, url: {remote_repo_url} at location: {repo_path_local}"
             print(
-                f"Repository {cloned_repo}, url: {remote_repo_url} cloned at location: {repo_path_local}"
+                f"Repository {cloned_repo}cloned via https, url: {remote_repo_url} to location: {repo_path_local}"
             )
         elif action == "test_clone_remote_repo_ssh":
-            print("Test clone a remote repo ssh")
+            print("Test clone a remote repo via ssh")
             cloned_repo = _BCmd.clone_remote_repo_ssh(remote_repo_url, repo_path_local)
             assert (
                 cloned_repo.working_dir == repo_path_local
             ), f"Failed to create {cloned_repo}, url: {remote_repo_url} at location: {repo_path_local}"
             print(
-                f"Repository {cloned_repo} via ssh, addr: {remote_repo_url} cloned at location: {repo_path_local}"
+                f"Repository {cloned_repo} cloned via ssh, addr: {remote_repo_url} to location: {repo_path_local}"
             )
         elif action == "test_commit":
             print("Test adding files to stage and commit")
