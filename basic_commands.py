@@ -9,7 +9,7 @@ class BasicCommands:
         """
         To Initialize a new repository
         :param local_path: a path on local filesystem
-        :return: initialized repo
+        :return: initialized repository obj
         """
         return Repo.init(local_path)
 
@@ -18,7 +18,7 @@ class BasicCommands:
         """
         To Open the Existing local repository
         :param local_path: a path on local filesystem
-        :return: cloned repo
+        :return: repository obj
         """
         return Repo(local_path)
 
@@ -29,7 +29,7 @@ class BasicCommands:
         using the repository URL repo_url
         :param repo_url: URL of remote repository
         :param local_path: a path on local filesystem
-        :return: cloned repo
+        :return: repository obj
         """
         print(f"Cloning repository, url: {repo_url} at location: {local_path}")
         return Repo.clone_from(repo_url, local_path)
@@ -50,18 +50,16 @@ class BasicCommands:
         Create a new commit in the local repository with the specified commit message.
         :param repo: local repository obj
         :param msg: commit message
-        :return: cloned repo
+        :return: repository obj
         """
         print(f"Created commit with message: {msg}")
         repo.index.commit(msg)
 
     @staticmethod
-    def push(repo, upstream):
+    def push(repo):
         """
         Push the local commits to the remote repo
         :param repo: repository obj
-        :param upstream: upstream branch
-        :return: cloned repo
         """
         origin = repo.remote(name="origin")
         origin.push()
@@ -101,8 +99,6 @@ class BasicCommands:
         """
         To update the local repository with the latest changes from the remote repo
         :param repo: repository obj
-        :param upstream_branch: upstream branch name
-        :return: new branch
         """
         origin = repo.remote(name="origin")
         origin.pull()

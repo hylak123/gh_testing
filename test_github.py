@@ -1,7 +1,9 @@
-import git
+
 import string
 from pathlib import Path
 from random import choices
+
+import git
 
 from basic_commands import BasicCommands as _BCmd
 
@@ -56,6 +58,11 @@ TEST_DATA = {
     },
     "test_pull": {
         "remote_repo_url": REPO_URL_HTTPS,
+        "repo_path_local": r"C:\work\gh_testing7",
+        "existing_branch_name": "main",
+    },
+    "test_push": {
+        # "remote_repo_url": REPO_URL_HTTPS,
         "repo_path_local": r"C:\work\gh_testing7",
         "existing_branch_name": "main",
     },
@@ -147,6 +154,20 @@ class TestGithub:
             existing_branch_name=existing_branch_name,
         )
 
+    def test_push(
+            self,
+            action="test_push",
+            # remote_repo_url=TEST_DATA["test_push"]["remote_repo_url"],
+            repo_path_local=TEST_DATA["test_push"]["repo_path_local"],
+            existing_branch_name=TEST_DATA["test_push"]["existing_branch_name"],
+    ):
+        self.run_gh_test_flow_template(
+            action=action,
+            # remote_repo_url=remote_repo_url,
+            repo_path_local=repo_path_local,
+            existing_branch_name=existing_branch_name,
+        )
+
     @staticmethod
     def run_gh_test_flow_template(
             action,
@@ -207,19 +228,6 @@ class TestGithub:
             assert (
                     head_commit.message == commit_msg
             ), f"Last commit message {commit_msg} differs from {head_commit.message}"
-        # elif action == "test_push":
-        #     with logger.group("Test pushing local commits to remote repo"):
-        #         # create repo obj
-        #         repo = TestGithub.open_existing_local_repo(repo_path_local)
-        #
-        #         origin = repo.remote(name='origin')
-        #         existing_branch = repo.heads[existing_branch_name]
-        #         existing_branch.checkout()
-        #
-        #         repo.index.commit('Initial commit on new branch')
-        #         print('Committed successfully')
-        #         origin.push()
-        #         print('Pushed changes to origin')
         elif action == "test_create_new_branch":
             print("Test creating a new branch")
             try:
@@ -283,3 +291,17 @@ class TestGithub:
                     print(repo.remotes.origin.pull())
                     # Push changes
                     print(repo.remotes.origin.push())
+        elif action == "test_push":
+            print("Test pushing local commits to remote repo")
+            repo = _BCmd.open_existing_local_repo(repo_path_local)
+            _BCmd.switch_branch(repo, existing_branch_name)
+
+            print("Test adding files to stage and commit")
+            data = (content_generator("file", 10, repo.working_dir),)
+            _BCmd.add_files_to_stage(repo, [data[0]])
+            commit_msg = content_generator("commit_msg", 10)
+            _BCmd.commit(repo, commit_msg)
+
+            print('Pushed changes to origin')
+
+            _BCmd.push(repo)
