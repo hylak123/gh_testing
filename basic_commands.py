@@ -100,17 +100,18 @@ class BasicCommands:
         :param repo: repository obj
         :param branch_name: name of a branch
         """
-        repo.git.checkout(branch_name)
+        return repo.git.checkout(branch_name)
 
     @staticmethod
-    def switch_branch(repo, existing_branch_name: str):
+    def switch_branch(repo, branch_name: str):
         """
         To switch to an existing branch
         :param repo: repository obj
-        :param existing_branch_name: branch name
+        :param branch_name: branch name
         """
-        existing_branch = repo.heads[existing_branch_name]
-        existing_branch.checkout()
+        branch = repo.heads[branch_name]
+        branch.checkout()
+        return branch
 
     @staticmethod
     def pull_from_remote_repo(repo):

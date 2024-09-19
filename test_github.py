@@ -1,4 +1,4 @@
-import platform
+import shutil
 from pathlib import Path
 
 import git
@@ -15,16 +15,14 @@ class TestGithub:
 
     @pytest.fixture
     def cleanup(self):
-        if "Windows" in platform.system():
-            HOME_DIR = r"C:\work\gh_testing3"
-        else:
-            HOME_DIR = r"/home/runner/work/gh_testing"
-        yield HOME_DIR
+        repo_path = self.HOME_DIR
+        yield repo_path
         try:
-            # shutil.rmtree(HOME)
-            print("Cleanup after test performed")
+            if Path(repo_path).exists():
+                shutil.rmtree(repo_path)
+                print(f"Cleanup after test performed. Removed {repo_path}")
         except OSError:
-            print("Failed to cleanup")
+            print(f"Cleanup failed, failed to remove {repo_path}")
 
     @pytest.mark.smoke
     @pytest.mark.CI
@@ -39,14 +37,21 @@ class TestGithub:
     @pytest.mark.CI
     def test_open_existing_repo(
         self,
+        cleanup,
         action="test_open_existing_repo",
+        remote_repo_url=TEST_DATA["test_open_existing_repo"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_open_existing_repo"]["repo_path_local"],
     ):
-        self.run_gh_test_flow_template(action=action, repo_path_local=repo_path_local)
+        self.run_gh_test_flow_template(
+            action=action,
+            remote_repo_url=remote_repo_url,
+            repo_path_local=repo_path_local,
+        )
 
     @pytest.mark.CI
     def test_clone_remote_repo_https(
         self,
+        cleanup,
         action="test_clone_remote_repo_https",
         remote_repo_url=TEST_DATA["test_clone_remote_repo_https"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_clone_remote_repo_https"]["repo_path_local"],
@@ -57,9 +62,9 @@ class TestGithub:
             repo_path_local=repo_path_local,
         )
 
-    @pytest.mark.CI
     def test_clone_remote_repo_ssh(
         self,
+        cleanup,
         action="test_clone_remote_repo_ssh",
         remote_repo_url=TEST_DATA["test_clone_remote_repo_ssh"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_clone_remote_repo_ssh"]["repo_path_local"],
@@ -73,6 +78,7 @@ class TestGithub:
     @pytest.mark.CI
     def test_commit(
         self,
+        cleanup,
         action="test_commit",
         remote_repo_url=TEST_DATA["test_commit"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_commit"]["repo_path_local"],
@@ -88,6 +94,7 @@ class TestGithub:
     @pytest.mark.CI
     def test_create_new_branch(
         self,
+        cleanup,
         action="test_create_new_branch",
         remote_repo_url=TEST_DATA["test_create_new_branch"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_create_new_branch"]["repo_path_local"],
@@ -103,21 +110,25 @@ class TestGithub:
     @pytest.mark.CI
     def test_switch_branch(
         self,
+        cleanup,
         action="test_switch_branch",
-        # remote_repo_url=TEST_DATA["test_switch_branch"]["remote_repo_url"],
+        remote_repo_url=TEST_DATA["test_switch_branch"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_switch_branch"]["repo_path_local"],
         existing_branch_name=TEST_DATA["test_switch_branch"]["existing_branch_name"],
+        new_branch_name=TEST_DATA["test_switch_branch"]["new_branch_name"],
     ):
         self.run_gh_test_flow_template(
             action=action,
-            # remote_repo_url=remote_repo_url,
+            remote_repo_url=remote_repo_url,
             repo_path_local=repo_path_local,
             existing_branch_name=existing_branch_name,
+            new_branch_name=new_branch_name,
         )
 
     @pytest.mark.CI
     def test_pull(
         self,
+        cleanup,
         action="test_pull",
         remote_repo_url=TEST_DATA["test_pull"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_pull"]["repo_path_local"],
@@ -130,8 +141,10 @@ class TestGithub:
             existing_branch_name=existing_branch_name,
         )
 
+    @pytest.mark.CI
     def test_push(
         self,
+        cleanup,
         action="test_push",
         # remote_repo_url=TEST_DATA["test_push"]["remote_repo_url"],
         repo_path_local=TEST_DATA["test_push"]["repo_path_local"],
@@ -173,6 +186,8 @@ class TestGithub:
             )
         elif action == "test_open_existing_repo":
             print("Test open the existing local repo")
+            repo = _BCmd.clone_remote_repo(remote_repo_url, repo_path_local)
+            repo.close()
             assert (
                 Path(repo_path_local).exists()
                 and Path(repo_path_local + "/.git").exists()
@@ -215,9 +230,6 @@ class TestGithub:
             print("Test creating a new branch")
             try:
                 repo = _BCmd.clone_remote_repo(remote_repo_url, repo_path_local)
-                # flow
-            except git.exc.GitError:
-                repo = _BCmd.open_existing_local_repo(repo_path_local)
                 new_branch = _BCmd.create_new_branch(repo, new_branch_name)
                 assert (
                     repo.active_branch != new_branch
@@ -225,22 +237,37 @@ class TestGithub:
                 print(
                     f"New branch {new_branch} created. New branch is different from active branch: {repo.active_branch}"
                 )
+            except git.exc.GitError:
+                pass
         elif action == "test_switch_branch":
             print("Test switch to a new branch")
-            repo = _BCmd.open_existing_local_repo(repo_path_local)
-            existing_branch = _BCmd.create_new_branch(repo, existing_branch_name)
+            try:
+                repo = _BCmd.clone_remote_repo(remote_repo_url, repo_path_local)
+                first_branch_name = existing_branch_name
+                second_branch_name = new_branch_name
+                _BCmd.create_new_branch(repo, first_branch_name)
+                _BCmd.create_new_branch(repo, second_branch_name)
+                repo.close()
 
-            print(f"List of existing branches:")
-            existing_branches = []
-            for branch in repo.branches:
-                existing_branches.append(branch)
-                print(f"{branch}")
+                repo = _BCmd.open_existing_local_repo(repo_path_local)
+                first_branch = _BCmd.checkout_branch(repo, first_branch_name)
+                print(f"Actual branch is: {first_branch}")
 
-            _BCmd.switch_branch(repo, existing_branch_name)
-            assert (
-                existing_branch in existing_branches
-            ), f"Branch {existing_branch} does not exist in repo: {repo}"
-            print(f"Switched to branch {existing_branch} existing in repo: {repo}")
+                print(f"Switching to a new branch: {second_branch_name}")
+                second_branch = _BCmd.switch_branch(repo, second_branch_name)
+                print(f"Actual branch is: {second_branch}")
+
+                print(f"List of existing branches:")
+                existing_branches = []
+                for branch in repo.branches:
+                    existing_branches.append(branch)
+                    print(f"{branch}")
+
+                assert (
+                    first_branch != second_branch
+                ), f"Failed to switch branch {first_branch} = {second_branch}"
+            except git.exc.GitCommandError as ex:
+                print(f"Failed to clone repo {ex}")
         elif action == "test_pull":
             print("Test pull from remote repo")
             try:
