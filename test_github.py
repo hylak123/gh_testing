@@ -10,6 +10,7 @@ from data_feed import get_data_feed
 
 class TestGithub:
     """A class holding git commands and tests."""
+
     HOME_DIR, TEST_DATA = get_data_feed()
 
     @pytest.fixture
@@ -43,6 +44,7 @@ class TestGithub:
     ):
         self.run_gh_test_flow_template(action=action, repo_path_local=repo_path_local)
 
+    @pytest.mark.CI
     def test_clone_remote_repo_https(
         self,
         action="test_clone_remote_repo_https",
@@ -55,6 +57,7 @@ class TestGithub:
             repo_path_local=repo_path_local,
         )
 
+    @pytest.mark.CI
     def test_clone_remote_repo_ssh(
         self,
         action="test_clone_remote_repo_ssh",
@@ -67,6 +70,7 @@ class TestGithub:
             repo_path_local=repo_path_local,
         )
 
+    @pytest.mark.CI
     def test_commit(
         self,
         action="test_commit",
@@ -81,6 +85,7 @@ class TestGithub:
             commit_msg=commit_msg,
         )
 
+    @pytest.mark.CI
     def test_create_new_branch(
         self,
         action="test_create_new_branch",
@@ -95,6 +100,7 @@ class TestGithub:
             new_branch_name=new_branch_name,
         )
 
+    @pytest.mark.CI
     def test_switch_branch(
         self,
         action="test_switch_branch",
@@ -109,6 +115,7 @@ class TestGithub:
             existing_branch_name=existing_branch_name,
         )
 
+    @pytest.mark.CI
     def test_pull(
         self,
         action="test_pull",
