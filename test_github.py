@@ -1,9 +1,9 @@
-
 import string
 from pathlib import Path
 from random import choices
 
 import git
+import pytest
 
 from basic_commands import BasicCommands as _BCmd
 
@@ -72,6 +72,7 @@ TEST_DATA = {
 class TestGithub:
     """A class holding git commands and tests."""
 
+    @pytest.mark.smoke
     def test_repo_init(
             self,
             action="test_repo_init",
