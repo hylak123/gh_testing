@@ -15,14 +15,17 @@ class TestGithub:
 
     @pytest.fixture
     def cleanup(self):
-        repo_path = self.HOME_DIR
+        repo_path = self.TEST_DATA
         yield repo_path
-        try:
-            if Path(repo_path).exists():
-                shutil.rmtree(repo_path)
-                print(f"Cleanup after test performed. Removed {repo_path}")
-        except OSError:
-            print(f"Cleanup failed, failed to remove {repo_path}")
+        for k, v in repo_path.items():
+            for k1, v1 in v.items():
+                if k1 == 'repo_path_local':
+                    try:
+                        if Path(str(v[k1])).exists():
+                            shutil.rmtree(str(v[k1]))
+                            print(f"Cleanup after test performed. Removed {str(v[k1])}")
+                    except OSError:
+                        print(f"Cleanup failed, failed to remove {str(v[k1])}")
 
     @pytest.mark.smoke
     @pytest.mark.CI
